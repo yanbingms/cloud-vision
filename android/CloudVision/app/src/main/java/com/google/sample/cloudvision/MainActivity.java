@@ -49,6 +49,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.api.services.vision.v1.model.TextAnnotation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -225,11 +226,19 @@ public class MainActivity extends AppCompatActivity {
             annotateImageRequest.setImage(base64EncodedImage);
 
             // add the features we want
+//            annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
+//                Feature labelDetection = new Feature();
+//                labelDetection.setType("LABEL_DETECTION");
+//                labelDetection.setMaxResults(MAX_LABEL_RESULTS);
+//                add(labelDetection);
+//            }});
+
+            // text detection
             annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                Feature labelDetection = new Feature();
-                labelDetection.setType("LABEL_DETECTION");
-                labelDetection.setMaxResults(MAX_LABEL_RESULTS);
-                add(labelDetection);
+                Feature textDetection = new Feature();
+                textDetection.setType("TEXT_DETECTION");
+                textDetection.setMaxResults(MAX_LABEL_RESULTS);
+                add(textDetection);
             }});
 
             // Add the list of one thing to the request
@@ -316,12 +325,19 @@ public class MainActivity extends AppCompatActivity {
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("I found these things:\n\n");
 
-        List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
-        if (labels != null) {
-            for (EntityAnnotation label : labels) {
-                message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
-                message.append("\n");
-            }
+//        List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
+//        if (labels != null) {
+//            for (EntityAnnotation label : labels) {
+//                message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
+//                message.append("\n");
+//            }
+//        } else {
+//            message.append("nothing");
+//        }
+
+        TextAnnotation label = response.getResponses().get(0).getFullTextAnnotation();
+        if (label != null) {
+            message.append(label.getText());
         } else {
             message.append("nothing");
         }
